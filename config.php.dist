@@ -1,0 +1,17 @@
+<?php
+$GLOBALS['CONFIG'] = Array();
+
+// General Configuration
+$GLOBALS['CONFIG']['HASH']        = 'SHA512';
+$GLOBALS['CONFIG']['SALT']        = 'Salt & Pepper!';
+$GLOBALS['CONFIG']['PLUGIN_PATH'] = 'plugins';
+
+// Database Connection (To use a differend Database as MySQL you must modify the core_db.php)
+$GLOBALS['CONFIG']['DB_DSN']      = '';
+$GLOBALS['CONFIG']['DB_USER']     = '';
+$GLOBALS['CONFIG']['DB_PASSWD']   = '';
+
+// Plugin - Email
+$GLOBALS['CONFIG']['plugin_email_sender']   = 'motion@localhost';
+
+?>

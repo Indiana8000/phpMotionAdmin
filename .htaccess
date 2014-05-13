@@ -1,0 +1,14 @@
+#AuthUserFile .htpasswd
+AuthName "phpMotionAdmin"
+AuthType Basic
+<Limit GET POST PUT>
+#require valid-user
+</Limit>
+<Files internal_trigger.php>
+Order deny,allow
+Deny from all
+</Files>
+<Files internal_check.php>
+Order deny,allow
+Deny from all
+</Files>

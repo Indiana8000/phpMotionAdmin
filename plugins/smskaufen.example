@@ -1,0 +1,52 @@
+<?php
+// Example implementation of SMS and MMS notification over www.smskaufen.com.
+// You have to set $GLOBALS['plugin_sms_user'] and $GLOBALS['plugin_sms_password'] in the config.php.
+
+
+if(isset($GLOBALS['plugin_sms_user']) && isset($GLOBALS['plugin_sms_password'])) {
+	$GLOBALS['PLUGINS']['plugin_sms_onstart'] = Array("EVENT START","SMS: On Event Start");
+	$GLOBALS['PLUGINS']['plugin_sms_bestpic'] = Array("EVENT END"  ,"MMS: Picture with most changes");
+}
+
+
+function plugin_sms_onstart($eCam,$eNum,$nX,$nP) {
+	// Send start SMS
+	$receiver = split(";",$nP);
+	for($i=0;$i<count($receiver);$i++) {
+		$receiver[$i] = trim($receiver[$i]);
+		$status = file("http://www.smskaufen.com/sms/gateway/sms.php?id=" . $GLOBALS['CONFIG']['plugin_sms_user'] . "&pw=" . $GLOBALS['CONFIG']['plugin_sms_password'] . "&type=2&empfaenger=" . $receiver[$i] . "&text=" . rawurlencode("Motion: Event Started - Cam: ".$eCam." Event: ".$eNum));
+	}
+	return true;
+}
+
+// *** Require that the "Path to URL" Translation is reachable from the Internet! ***
+function plugin_sms_bestpic($eCam,$eNum,$nX,$nP) {
+	$bestFile = "";
+	$bestSize = 0;
+	$stmt = $GLOBALS['DB']->prepare("SELECT eFile, eData FROM events WHERE eCam = :cid AND eNum = :eid AND eType = 'PICTURE' AND eData != '0 0 0 0'");
+	$stmt->bindValue(':cid', $eCam, PDO::PARAM_INT);
+	$stmt->bindValue(':eid', $eNum, PDO::PARAM_INT);
+	if($stmt->execute()) {
+		while($row = $stmt->fetch()) {
+			$tmp = explode(" ",$row['eData']);
+			if($tmp[0]*$tmp[1]>$bestSize) {
+				$bestSize = $tmp[0] * $tmp[1];
+				$bestFile = $row['eFile'];
+			}
+		}
+	}
+	if( $bestSize > 0 ) {
+		$newpath = explode(" => ",$GLOBALS['CONFIG']['PathToURL']);
+		$bestFile = str_replace($newpath[0],$newpath[1],$bestFile);
+		$receiver = split(";",$nP);
+		for($i=0;$i<count($receiver);$i++) {
+			$receiver[$i] = trim($receiver[$i]);
+			$status = file('http://www.smskaufen.com/sms/gateway/mms.php?id=' . $GLOBALS['CONFIG']['plugin_sms_user'] . '&pw=' . $GLOBALS['CONFIG']['plugin_sms_password'] . '&empfaenger=' . $receiver[$i] . '&bild[0]=' . $bestFile);
+			//echo print_r($status);
+		}
+	}
+	return true;
+}
+
+
+?>
