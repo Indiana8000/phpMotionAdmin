@@ -51,7 +51,7 @@
 		while($row = $stmt->fetch()) {
 			echo '<tr data-cid="'.$row['tID'].'">';
 			if($row['tID'] <= $motion_status['Cams']) {
-				echo '<td><img width="80" height="60" src="'.urlOfCam($row['tID']).'" /></td>';
+				echo '<td><img width="80" height="60" src="proxy_cam.php?id='.$row['tID'].'" /></td>';
 			} else {
 				echo '<td><img width="80" height="60" src="img/offline.gif" /></td>';
 			}

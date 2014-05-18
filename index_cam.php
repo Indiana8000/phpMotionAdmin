@@ -30,7 +30,7 @@
 <?php
 	$motion_status = getMotionStatus();
 	if($_GET['cid'] <= $motion_status['Cams']) {
-		echo '<img width="100%" src="' . urlOfCam($_GET['cid']) . '" />';
+		echo '<img width="100%" src="proxy_cam.php?id='.$_GET['cid'].'" />';
 	} else {
 		echo '<img width="100%" src="img/offline.gif" />';
 	}
@@ -72,7 +72,7 @@
 				}
 
 				if($stmt3->execute() && ($row3 = $stmt3->fetch())) {
-					echo '<td class="text-right"><span class="glyphicon glyphicon-film"></span></td>';
+					echo '<td class="text-right"><span class="glyphicon glyphicon-film btn_cam_event_movie"></span></td>';
 				} else {
 					echo '<td>&nbsp;</td>';
 				}
@@ -95,7 +95,7 @@
 					if($(event.target).hasClass('text-center') && $(this).attr('data-eid') > 0)
 						window.location.href = 'index_event_pictures.php' + window.location.search + '&eid=' + $(this).attr('data-eid');
 				});
-				$('span').click(function(event) {
+				$('.btn_cam_event_movie').click(function(event) {
 					event.preventDefault();
 					if($(this).closest('tr').attr('data-eid') > 0)
 						window.location.href = 'index_event_movie.php' + window.location.search + '&eid=' + $(this).closest('tr').attr('data-eid');
