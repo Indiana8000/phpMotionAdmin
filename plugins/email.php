@@ -8,7 +8,7 @@ $GLOBALS['PLUGINS']['plugin_email_movie']   = Array("EVENT END"  ,"Email: Movie"
 
 function plugin_email_onstart($eCam,$eNum,$nX,$nP) {
 	// Send Email
-	$receiver = split(";",$nP);
+	$receiver = explode(";",$nP);
 	for($i=0;$i<count($receiver);$i++) {
 		$receiver[$i] = trim($receiver[$i]);
 		if(filter_var($receiver[$i], FILTER_VALIDATE_EMAIL)) {
@@ -36,7 +36,7 @@ function plugin_email_randpic($eCam,$eNum,$nX,$nP) {
 		}
 
 		// Send Email with File
-		$receiver = split(";",$nP);
+		$receiver = explode(";",$nP);
 		for($i=0;$i<count($receiver);$i++) {
 			$receiver[$i] = trim($receiver[$i]);
 			if(filter_var($receiver[$i], FILTER_VALIDATE_EMAIL)) {
@@ -67,7 +67,7 @@ function plugin_email_bestpic($eCam,$eNum,$nX,$nP) {
 			$files[count($files)] = $bestFile;
 
 			// Send Email with File
-			$receiver = split(";",$nP);
+			$receiver = explode(";",$nP);
 			for($i=0;$i<count($receiver);$i++) {
 				$receiver[$i] = trim($receiver[$i]);
 				if(filter_var($receiver[$i], FILTER_VALIDATE_EMAIL)) {
@@ -91,7 +91,7 @@ function plugin_email_movie($eCam,$eNum,$nX,$nP) {
 		}
 
 		// Send Email with File
-		$receiver = split(";",$nP);
+		$receiver = explode(";",$nP);
 		for($i=0;$i<count($receiver);$i++) {
 			$receiver[$i] = trim($receiver[$i]);
 			if(filter_var($receiver[$i], FILTER_VALIDATE_EMAIL)) {
@@ -112,29 +112,29 @@ function plugin_email_body($eCam,$eNum,$eEvent) {
 }
 
 function plugin_email_sendmail($subject,$message,$to,$files) {
-	$boundary = strtoupper(md5(uniqid(time())));
-	$mail_header  = "From: " . $GLOBALS['CONFIG']['plugin_email_sender'] . "\n";
-	$mail_header .= "MIME-Version: 1.0";
-	$mail_header .= "\nContent-Type: multipart/mixed; boundary=$boundary";
-	$mail_header .= "\n\nThis is a multi-part message in MIME format";
-	$mail_header .= "\n--" . $boundary; 
-	$mail_header .= "\nContent-Type: text/plain";
-	$mail_header .= "\nContent-Transfer-Encoding: 8bit";
-	$mail_header .= "\n\n" . $message . "\n\n\n";
+        $boundary = strtoupper(md5(uniqid(time())));
+        $mail_header  = "From: " . $GLOBALS['CONFIG']['plugin_email_sender'];
+        $mail_header .= "\r\nMIME-Version: 1.0";
+        $mail_header .= "\r\nContent-Type: multipart/mixed; boundary=$boundary";
+        $mail_body  = "--" . $boundary; 
+        $mail_body .= "\r\nContent-Type: text/plain";
+        $mail_body .= "\r\nContent-Transfer-Encoding: 8bit";
+        $mail_body .= "\r\n\r\n" . $message;
 
-	for($x=0;$x<count($files);$x++) {
-		$file_name = basename($files[$x]);
-		$file_content = fread(fopen($files[$x],"r"),filesize($files[$x]));
-		$file_content = chunk_split(base64_encode($file_content));
-		$mail_header .= "\n--" . $boundary;
-		$mail_header .= "\nContent-Type: application/octetstream; name=\"" . $file_name . "\"";
-		$mail_header .= "\nContent-Transfer-Encoding: base64";
-		$mail_header .= "\nContent-Disposition: attachment; filename=\"" . $file_name . "\"";
-		$mail_header .= "\n\n" . $file_content;
-	}
-	
-	$mail_header .= "\n--" . $boundary . "--";
-	mail($to,$subject,$message,$mail_header);
+        if($files) for($x=0;$x<count($files);$x++) {
+                $file_name    = basename($files[$x]);
+                $file_content = fread(fopen($files[$x],"r"),filesize($files[$x]));
+                $file_content = chunk_split(base64_encode($file_content));
+                $mail_body   .= "\r\n--" . $boundary;
+                $mail_body   .= "\r\nContent-Type: application/octetstream; name=\"" . $file_name . "\"";
+                $mail_body   .= "\r\nContent-Transfer-Encoding: base64";
+                $mail_body   .= "\r\nContent-Disposition: attachment; filename=\"" . $file_name . "\"";
+                $mail_body   .= "\r\n\r\n" . $file_content;
+        }
+        
+        $mail_body .= "\r\n--" . $boundary . "--";
+        mail($to,$subject,$mail_body,$mail_header);
 }
+
 
 ?>
