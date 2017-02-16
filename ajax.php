@@ -125,6 +125,10 @@ if(isset($_POST['action'])) {
 
 		if($stmt->execute()) {
 			$feedback = 'OK';
+			// Log activity to events
+			$stmt = $GLOBALS['DB']->prepare("INSERT INTO events (eCam,eType,eNum, eFile, eData) VALUES (0,'MASTER SWITCH',0,'',:value)");
+			$stmt->bindValue(':value', $_POST['status'], PDO::PARAM_STR);
+			$stmt->execute();
 		} else {
 			$feedback = 'SQL Error';
 		}
